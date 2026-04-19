@@ -34,7 +34,7 @@ def register_new_employee():
     }
     
   for key in dict_employee:
-    
+
     if key == "salary":
       while True:
         try:
@@ -74,9 +74,74 @@ def register_new_employee():
     f"Hire Date: {employee['hire_date']}\n"
   )
 
+def print_employee(employee):
+    print(
+        f"\nID: {employee['id']}\n"
+        f"Name: {employee['name']}\n"
+        f"Position: {employee['position']}\n"
+        f"Department: {employee['department']}\n"
+        f"Salary: ${employee['salary']:.2f}\n"
+        f"Hire Date: {employee['hire_date']}\n"
+    )
+
 def list_employees():
   for employee in employees:
     print(employee)
+
+def get_employee_by_id(employee_id):
+    for employee in employees:
+        if employee["id"] == employee_id:
+            return employee
+    return None
+
+def get_employees():
+  if not employees:
+    print("No employees registered.")
+    return
+
+  while True:
+    print("\n====== Get Employees ======")
+    print("1. Show all employees")
+    print("2. Search employee by ID")
+    print("3. Search employee by name")
+    print("4. Show total payroll")
+    print("5. Back to main menu")
+
+    option = input("Choose an option: ").strip()
+
+    match option:
+      case "1":
+        list_employees()
+
+      case "2":
+        employee_id = input("Enter the employee ID: ").strip()
+        employee = get_employee_by_id(employee_id)
+
+        if employee:
+          print_employee(employee)
+        else:
+          print(f"Employee with ID {employee_id} not found.")
+
+      case "3":
+        name = input("Enter the employee name: ").strip().lower()
+        found_employees = [
+          employee for employee in employees
+          if name in employee["name"].lower()
+          ]
+
+        if found_employees:
+          for employee in found_employees:
+            print_employee(employee)
+        else:
+          print(f"No employees found with name containing '{name}'.")
+
+      case "4":
+        
+      case "5":
+        break
+
+      case _:
+        print("Invalid option! Please try again.")
 
 def update_employee_salary():
   list_employees()
@@ -132,7 +197,7 @@ def menu():
             if choice == "n":
               break
         case "2":
-            # get_employees()
+            get_employees()
             print("Employees retrieved.")
             break
         case "3":
