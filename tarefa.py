@@ -9,16 +9,44 @@ def load_employees():
   global employee_file, employees
   try:
     with open(employee_file, "r") as file:
-      leitor = csv.reader(file)
-      employees = [linha[0] for linha in leitor if linha]
+      reader = csv.reader(file)
+      employees = []
+      for row in reader:
+        if row:
+          if row[0] == "id":
+            continue
+          employees.append({
+            "id": int(row[0]),
+            "name": row[1],
+            "salary": float(row[2]),
+            "department": row[3],
+            "position": row[4],
+            "hire_date": row[5]
+          })
       print(f"Loaded {len(employees)} employees from {employee_file}.")
   except FileNotFoundError:
-    # create file if it doesn't exist
     with open(employee_file, "w") as file:
-      csv.writer(file).writerows([["id", "name", "salary", "department", "job_description", "hire_date"]])
+      csv.writer(file).writerows([["id", "name", "salary", "department", "position", "hire_date"]])
       pass
     employees.clear()
     print(f"No existing employee file found. Starting with an empty employee list.")
+
+def save_employees():
+  global employee_file, employees
+  with open(employee_file, "w", newline="") as file:
+    writer = csv.writer(file)
+    writer.writerow(["id", "name", "salary", "department", "position", "hire_date"])
+    for employee in employees:
+      writer.writerow([
+        employee["id"],
+        employee["name"],
+        employee["salary"],
+        employee["department"],
+        employee["position"],
+        employee["hire_date"]
+      ])
+  print(f"Employees saved successfully.")
+  
 
 def generate_employee_id():
   new_id = len(employees) + 1
@@ -205,10 +233,10 @@ def menu():
             break
         case "4":
             terminate_employee()
-            # save_employees()
             print("Employees saved. Exiting the program...")
             break
         case "5":
+            save_employees()
             print("Exiting the program...")
             exit()
         case _:
