@@ -1,4 +1,5 @@
 import csv
+from datetime import datetime
 
 employees = []
 
@@ -19,57 +20,59 @@ def load_employees():
     employees.clear()
     print(f"No existing employee file found. Starting with an empty employee list.")
 
+def generate_employee_id():
+  new_id = len(employees) + 1
+  return f"{new_id:06d}"
+
 def register_new_employee():
   dict_employee = {
-        "id": "1234",
         "name": "",
-        "position": "",
         "department": "",
+        "position": "",   
         "salary": "",
         "hire_date": ""
     }
     
   for key in dict_employee:
-    oi oi
-      
-    name = input("Enter the employee's name: ")
-    department = input("Enter the employee's department: ")
-    position = input("Enter the  employee's position: ")
-      
-    while True:
-      try:
-        salary = float(input("Enter the employee's salary: "))
-        break
-      except ValueError:
-        print("Invalid salary. Please enter a numeric value.")
-      
-    while True:
-      try:
-        hire_date = input("Enter the employee's hire date (YYYY-MM-DD): ")
-        break
-      except:
-        print("Invalid salary. Please enter a numeric value.")
-
-    employee = {
-        "id": id,
-        "name": name,  
-        "position": position,
-        "department": department,
-        "salary": salary,
-        "hire_date": hire_date
-    }
-
-    employees.append(employee)
     
-    print(
-        f"\nEmployee successfully registered!\n"
-        f"ID: {id}\n"
-        f"Name: {name}\n"
-        f"Department: {department}\n"
-        f"Role: {position}\n"
-        f"Salary: ${salary:.2f}\n"
-        f"Hire Date: {hire_date}\n"
-    )
+    if key == "salary":
+      while True:
+        try:
+          value = float(input(f"Enter the employee's {key}: "))
+          dict_employee[key] = value
+          break
+        except ValueError:
+          print(f"Invalid {key}. Please enter a numeric value.")
+
+    elif key == "hire_date":
+      while True:
+        value = input("Enter the employee's hire date (YYYY-MM-DD): ")
+        try:
+          datetime.strptime(value, "%Y-%m-%d")
+          dict_employee[key] = value
+          break
+        except ValueError:
+          print("Invalid date format. Use YYYY-MM-DD.")
+
+    else:
+      dict_employee[key] = input(f"Enter the employee's {key}: ").strip()
+
+  employee = {
+    "id": generate_employee_id(),
+    **dict_employee 
+  }
+
+  employees.append(employee)
+
+  print(
+    f"\nEmployee successfully registered!\n"
+    f"ID: {employee['id']}\n"
+    f"Name: {employee['name']}\n"
+    f"Position: {employee['position']}\n"
+    f"Department: {employee['department']}\n"
+    f"Salary: ${employee['salary']:.2f}\n"
+    f"Hire Date: {employee['hire_date']}\n"
+  )
 
 def list_employees():
   for employee in employees:
@@ -116,11 +119,20 @@ def menu():
 
     match option:
         case "1":
+          while True:
             register_new_employee()
-            print("Employee registered.")
-            break
+            
+            while True:
+              choice = input("Do you want to register another employee? (y/n): ").lower()
+              if choice in ["y", "n"]:
+                break
+              else:
+                print("Invalid option. Please enter 'y' or 'n'.")
+
+            if choice == "n":
+              break
         case "2":
-            get_employees()
+            # get_employees()
             print("Employees retrieved.")
             break
         case "3":
