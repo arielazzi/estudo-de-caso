@@ -2,11 +2,11 @@ import csv
 from datetime import datetime
 
 employees = []
-
 employee_file = "employees.csv"
 
 def load_employees():
   global employee_file, employees
+  
   try:
     with open(employee_file, "r") as file:
       reader = csv.reader(file)
@@ -16,7 +16,7 @@ def load_employees():
           if row[0] == "id":
             continue
           employees.append({
-            "id": int(row[0]),
+            "id": row[0],
             "name": row[1],
             "salary": float(row[2]),
             "department": row[3],
@@ -24,12 +24,15 @@ def load_employees():
             "hire_date": row[5]
           })
       print(f"Loaded {len(employees)} employees from {employee_file}.")
+  
   except FileNotFoundError:
     with open(employee_file, "w") as file:
       csv.writer(file).writerows([["id", "name", "salary", "department", "position", "hire_date"]])
       pass
     employees.clear()
     print(f"No existing employee file found. Starting with an empty employee list.")
+
+#----------------------------------------------------------------------------------#
 
 def save_employees():
   global employee_file, employees
@@ -46,7 +49,8 @@ def save_employees():
         employee["hire_date"]
       ])
   print(f"Employees saved successfully.")
-  
+
+#----------------------------------------------------------------------------------#
 
 def generate_employee_id():
   new_id = len(employees) + 1
@@ -102,25 +106,35 @@ def register_new_employee():
     f"Hire Date: {employee['hire_date']}\n"
   )
 
-def print_employee(employee):
-    print(
-        f"\nID: {employee['id']}\n"
-        f"Name: {employee['name']}\n"
-        f"Position: {employee['position']}\n"
-        f"Department: {employee['department']}\n"
-        f"Salary: ${employee['salary']:.2f}\n"
-        f"Hire Date: {employee['hire_date']}\n"
-    )
+#----------------------------------------------------------------------------------#
 
 def list_employees():
   for employee in employees:
     print(employee)
 
+def print_employee(employee):
+  print(
+    f"\nID: {employee['id']}\n"
+    f"Name: {employee['name']}\n"
+    f"Position: {employee['position']}\n"
+    f"Department: {employee['department']}\n"
+    f"Salary: ${employee['salary']:.2f}\n"
+    f"Hire Date: {employee['hire_date']}\n"
+  )
+
 def get_employee_by_id(employee_id):
-    for employee in employees:
-        if employee["id"] == employee_id:
-            return employee
+  for employee in employees:
+    if employee["id"] == employee_id:
+      return employee
     return None
+
+def calculate_total_payroll():
+  if not employees:
+    return 0
+
+  total = sum(employee["salary"] for employee in employees)
+  return total
+
 
 def get_employees():
   if not employees:
@@ -152,10 +166,7 @@ def get_employees():
 
       case "3":
         name = input("Enter the employee name: ").strip().lower()
-        found_employees = [
-          employee for employee in employees
-          if name in employee["name"].lower()
-          ]
+        found_employees = [employee for employee in employees if name in employee["name"].lower()]
 
         if found_employees:
           for employee in found_employees:
@@ -164,26 +175,51 @@ def get_employees():
           print(f"No employees found with name containing '{name}'.")
 
       case "4":
-        
+        total = calculate_total_payroll()
+        print(f"\nTotal payroll cost: ${total:.2f}\n")
+
       case "5":
         break
 
       case _:
         print("Invalid option! Please try again.")
 
+#----------------------------------------------------------------------------------#
+
 def update_employee_salary():
   list_employees()
 
   employee_id = input("Enter the employee ID to update salary: ")
-  new_salary = input("Enter the new salary: ")
 
   for employee in employees:
     if employee["id"] == employee_id:
+
+      while True:
+        change_position = input("Will the position change? (y/n): ").strip().lower()
+        if change_position not in ["y", "n"]:
+          print("Invalid option. Please enter 'y' or 'n'.")
+          continue
+        break
+
+      if change_position == "y":
+        new_position = input("Enter the new position: ")
+        employee["position"] = new_position
+
+      while True:
+        new_salary = float(input("Enter the new salary: "))
+        if employee["salary"] >= new_salary:
+          print("The new salary can't be lower or equal than the actual salary")
+          continue
+        break
+      
       employee["salary"] = new_salary
-      print(f"Employee {employee_id} salary updated to {new_salary}.")
+  
+      print(f"Employee {employee_id} updated successfully.")
       return
 
   print(f"Employee with ID {employee_id} not found.")
+
+#----------------------------------------------------------------------------------#
 
 def terminate_employee():
     list_employees()
@@ -198,6 +234,7 @@ def terminate_employee():
 
     print(f"Employee with ID {employee_id} not found.")
 
+#----------------------------------------------------------------------------------#
 
 def menu():
   while True:
@@ -224,21 +261,45 @@ def menu():
 
             if choice == "n":
               break
+
         case "2":
+          while True:
             get_employees()
-            print("Employees retrieved.")
             break
+
         case "3":
+          while True:
             update_employee_salary()
-            break
+
+            while True:
+              choice = input("Do you want to update another employee? (y/n): ").lower()
+              if choice in ["y", "n"]:
+                break
+              else:
+                print("Invalid option. Please enter 'y' or 'n'.")
+
+            if choice == "n":
+              break
+
         case "4":
+          while True:
             terminate_employee()
-            print("Employees saved. Exiting the program...")
-            break
+          
+            while True:
+              choice = input("Do you want to update another employee? (y/n): ").lower()
+              if choice in ["y", "n"]:
+                break
+              else:
+                print("Invalid option. Please enter 'y' or 'n'.")
+
+            if choice == "n":
+              break
+
         case "5":
             save_employees()
             print("Exiting the program...")
             exit()
+
         case _:
             print("Invalid option! Please try again.")
 
