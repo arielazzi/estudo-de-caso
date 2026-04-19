@@ -30,7 +30,7 @@ def register_new_employee():
     }
     
   for key in dict_employee:
-
+    oi oi
       
     name = input("Enter the employee's name: ")
     department = input("Enter the employee's department: ")
